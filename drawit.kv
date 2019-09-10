@@ -1,0 +1,173 @@
+#:kivy 1.10.1
+
+#:import main main
+
+
+<ScreenLayout@BoxLayout>:
+    id: layout
+    orientation: 'vertical'
+    padding: '20dp'
+
+    canvas.before:
+        Color:
+            rgb: main.colors['screen']
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<Button>:
+    background_color: main.colors['btn']
+    background_normal: ''
+    font_size: '24sp'
+
+<MainMenu>:
+    name: 'main'
+    lbl_highscore: lbl_highscore
+
+    ScreenLayout:
+        Label:
+            markup: True
+            text: '[b]Draw it![/b]'
+            font_size: '64sp'
+            font_name: 'modak'
+
+        Label:
+            id: lbl_highscore
+            font_size: '28sp'
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            Button:
+                id: btn_play
+                text: 'Play'
+                on_release: root.manager.current = 'game'
+
+            Button:
+                text: 'Instruction'
+                on_release: root.manager.current = 'help'
+
+
+<HelpScreen>:
+    name: 'help'
+
+    ScreenLayout:
+
+        Label:
+            text: 'After pressing the start button, you are given 30 seconds to repeat the sketch shown above.\n\nTo make the game check your drawing, click on the Check button. If the pattern is repeated exactly, 5 seconds is added to the timer, otherwise it is subtracted.\n\nTry to repeat the pattern as accurately as possible.\nGood luck!'
+            font_size: '20sp'
+            text_size: self.width, None
+        Button:
+            text: 'Return'
+            size_hint_y: 0.5
+            on_release: root.manager.current = 'main'
+
+
+<GameScreen>:
+    name: 'game'
+    desired_pic: desired_pic
+    lbl_timer: lbl_timer
+    painter: painter
+    l_tools: l_tools
+    btn_start: btn_start
+    btn_undo: btn_undo
+    btn_clear: btn_clear
+    lbl_score: lbl_score
+
+    ScreenLayout:
+        padding: 0
+
+        canvas.before:
+            Color:
+                rgb: main.colors['game_screen']
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        RelativeLayout:
+            id: fl_l
+            size_hint_y: None
+            height: 0.75 * self.width
+            Image:
+                id: desired_pic
+
+                canvas.before:
+                    Color:
+                        rgb: 1, 1, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+                canvas.after:
+                    Color:
+                        rgb: 0.5, 0.5, 0.5
+                    Line:
+                        points: (self.center_x, self.height, self.center_x, self.y)
+                        width: 1
+                    Line:
+                        points: (self.x, self.center_y, self.width, self.center_y)
+                        width: 1
+            Button:
+                text: '<-'
+                size_hint: 0.15, 0.15
+                pos_hint: {'top': 1}
+                on_release: root.game_end()
+
+        BoxLayout:
+            Label:
+                id: lbl_timer
+                color: (0, 0, 0, 1)
+                font_size: '20sp'
+            Button:
+                id: btn_start
+                text: 'Start'
+                on_release: root.btn_start_clb()
+                size_hint_x: 0.5
+
+        PainterWidget:
+            id: painter
+            size_hint_y: None
+            height: 0.75 * self.width
+
+            canvas.before:
+                Color:
+                    rgb: 1, 1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+        BoxLayout:
+            id: l_tools
+            disabled: True
+            Label:
+                id: lbl_score
+                text: 'Score: 0'
+                font_size: '24sp'
+                color: 0, 0, 0, 1
+            Button:
+                id: btn_undo
+                text: 'Undo'
+                size_hint_x: 0.5
+                on_release: painter.undo()
+            Button:
+                id: btn_clear
+                text: 'Clear'
+                size_hint_x: 0.5
+                on_release: painter.clear()
+
+
+<GameOverScreen>:
+    name: 'gameover'
+    lbl: lbl
+
+    ScreenLayout:
+        Label:
+            id: lbl
+            markup: True
+            halign: 'center'
+
+        Button:
+            text: 'Go to main menu'
+            size_hint_y: 0.3
+            on_release: root.manager.current = 'main'
